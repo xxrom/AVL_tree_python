@@ -35,7 +35,7 @@ class AVL(object):
 
   def insert(self, data):
     self.root = self.insertNode(data, self.root)
-
+  ###
   def insertNode(self, data, node):
     if not node: # подДерево пустое
       return Node(data)
@@ -50,6 +50,52 @@ class AVL(object):
       self.calcHeight(node.rightChild)) + 1
 
     return self.settleViolation(data, node) # проверяем валидность дерева
+
+  def remove(self, data):
+    if not self.root:
+      return
+
+    self.root = self.removeNode(data, node)
+
+  def removeNode(self, data, node):
+    if not node:
+      return
+
+    if data < node.data:
+      node.leftChild = self.removeNode(data, node.leftChild)
+    elif data > node.data:
+      node.rightChild = self.removeNode(data, node.rightChild)
+
+    # нашли node который нужно удалить
+    if not node.rightChild and not node.leftChild: # когда лист
+      print('Удаляем лист %s ' % node.data)
+      del node
+      return None
+
+    elif node.rightChild and not node.leftChild: # есть только правый ребенок
+      print('Удаляем node с правым ребенком %s ' % node.data)
+      temp = node.rightChild
+      del node
+      return temp
+    elif node.leftChild and not node.rightChild: # есть только левый ребенок
+      print('Удаляем node с левым ребенком %s ' % node.data)
+      temp = node.leftChild
+      del node
+      return temp
+
+    print('Удаляем node с двумя детьми %s ' % node.data)
+    minNode = self.getMinNode(node.rightChild)
+    temp = node
+    node = minNode
+    node.rightChild = self.removeNode(temp.data, node.rightChild)
+    return node
+  ###
+  def getMinNode(self, node):
+    if node.leftChild:
+      return self.getMinNode(node.leftChild)
+
+    return node.data # нашли минимум
+
 
   def calcHeight(self, node):
     if not node:
@@ -89,7 +135,7 @@ class AVL(object):
 
     # вернем новый корень подДерева
     return tempLeftChild
-
+  ###
   # O(1)
   def rotateLeft(self, node):
     print('Rotate to the left on node %s ' % node.data)
@@ -115,12 +161,13 @@ class AVL(object):
     # вернем новый корень подДерева
     return tempRightChild
 
+  # O(N)
   def traverse(self):
     if not self.root:
       return
 
     self.traverseInOrder(self.root)
-
+  ### вывод: левый - корень - правый
   def traverseInOrder(self, node):
     if node.leftChild: # != None
       self.traverseInOrder(node.leftChild)
@@ -131,29 +178,38 @@ class AVL(object):
       self.traverseInOrder(node.rightChild)
 
 
-avl = AVL()
-avl.insert(10)
-avl.insert(20)
-avl.insert(30)
-avl.traverse() # right right heavy situation 10 <- 20 -> 30
+# avl = AVL()
+# avl.insert(10)
+# avl.insert(20)
+# avl.insert(30)
+# avl.traverse() # right right heavy situation 10 <- 20 -> 30
 
 
-avl2 = AVL()
-avl2.insert(5)
-avl2.insert(3)
-avl2.insert(2)
-avl2.traverse() # left left heavy situation 2 <- 3 -> 5
+# avl2 = AVL()
+# avl2.insert(5)
+# avl2.insert(3)
+# avl2.insert(2)
+# avl2.traverse() # left left heavy situation 2 <- 3 -> 5
 
 
-avl3 = AVL()
-avl3.insert(5)
-avl3.insert(3)
-avl3.insert(4)
-avl3.traverse() # left right heavy situation 3 <- 4 -> 5
+# avl3 = AVL()
+# avl3.insert(5)
+# avl3.insert(3)
+# avl3.insert(4)
+# avl3.traverse() # left right heavy situation 3 <- 4 -> 5
 
 
-avl3 = AVL()
-avl3.insert(50)
-avl3.insert(60)
-avl3.insert(55)
-avl3.traverse() # right left heavy situation 50 <- 55 -> 60
+# avl3 = AVL()
+# avl3.insert(50)
+# avl3.insert(60)
+# avl3.insert(55)
+# avl3.traverse() # right left heavy situation 50 <- 55 -> 60
+
+avl4 = AVL()
+avl4.insert(1)
+avl4.insert(2)
+avl4.insert(3)
+avl4.insert(4)
+alv4.traverse() # 1 2 3 4
+avl4.remove(2)
+alv4.traverse() # 1 3 4
