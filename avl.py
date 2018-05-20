@@ -50,51 +50,77 @@ class AVL(object):
       self.calcHeight(node.rightChild)) + 1
 
     return self.settleViolation(data, node) # проверяем валидность дерева
+  ###
+  def insertCheckBalanceTree(self, node):
+    balance = self.calcBalance(node)
+    if balance > 1 and self.calcBalance(node.leftChild) >= 0: # N1
+      print('Left left heavy situation ...')
+      return self.rotateRight(node) # 1
+
+    elif balance < -1 and self.calcBalance(node.rightChild) < 0: # N2
+      print('Right right heavy situation ...')
+      return self.rotateLeft(node) # 1
+
+    elif balance > 1 and self.calcBalance(node.leftChild) < 0: # N3
+      print('Left right heavy situation ... ')
+      node.leftChild = self.rotateLeft(node.leftChild) # 1
+      return self.rotateRight(node) # 2
+
+    elif balance < -1 and self.calcBalance(node.right) >= 0: # N4
+      print('Right left heavy situation ...')
+      node.rightChild = self.rotateRight(node.rightChild) # 1
+      return self.rotateLeft(node) # 2
+
+    print('subTree balanced =) ... %s ' % node.data)
+    return node
 
   def remove(self, data):
-    if not self.root:
-      return
-
-    self.root = self.removeNode(data, node)
-
+    if self.root:
+      self.root = self.removeNode(data, self.root)
+  ###
   def removeNode(self, data, node):
     if not node:
-      return
+      return None
 
     if data < node.data:
       node.leftChild = self.removeNode(data, node.leftChild)
     elif data > node.data:
       node.rightChild = self.removeNode(data, node.rightChild)
+    else:
+      # нашли node который нужно удалить
+      if not node.rightChild and not node.leftChild: # когда лист
+        print('Удаляем лист %s ' % node.data)
+        del node
+        return None
 
-    # нашли node который нужно удалить
-    if not node.rightChild and not node.leftChild: # когда лист
-      print('Удаляем лист %s ' % node.data)
-      del node
-      return None
+      elif node.rightChild and not node.leftChild: # есть только правый ребенок
+        print('Удаляем node с правым ребенком %s ' % node.data)
+        temp = node.rightChild
+        del node
+        return temp
+      elif node.leftChild and not node.rightChild: # есть только левый ребенок
+        print('Удаляем node с левым ребенком %s ' % node.data)
+        temp = node.leftChild
+        del node
+        return temp
 
-    elif node.rightChild and not node.leftChild: # есть только правый ребенок
-      print('Удаляем node с правым ребенком %s ' % node.data)
-      temp = node.rightChild
-      del node
-      return temp
-    elif node.leftChild and not node.rightChild: # есть только левый ребенок
-      print('Удаляем node с левым ребенком %s ' % node.data)
-      temp = node.leftChild
-      del node
-      return temp
+      print('Удаляем node с двумя детьми %s ' % node.data)
+      minNode = self.getMinNode(node.rightChild)
+      node.data = minNode.data
+      node.rightChild = self.removeNode(minNode.data, node.rightChild)
 
-    print('Удаляем node с двумя детьми %s ' % node.data)
-    minNode = self.getMinNode(node.rightChild)
-    temp = node
-    node = minNode
-    node.rightChild = self.removeNode(temp.data, node.rightChild)
-    return node
+    # теперь нужно отбалансировать дерево, где удалили
+    node.height = max(
+      self.calcHeight(node.leftChild),
+      self.calcHeight(node.rightChild)) + 1
+
+    return self.insertCheckBalanceTree(node) # балансируем дерево
   ###
   def getMinNode(self, node):
     if node.leftChild:
       return self.getMinNode(node.leftChild)
 
-    return node.data # нашли минимум
+    return node # нашли минимум
 
 
   def calcHeight(self, node):
@@ -163,10 +189,9 @@ class AVL(object):
 
   # O(N)
   def traverse(self):
-    if not self.root:
-      return
-
-    self.traverseInOrder(self.root)
+    print('traverse')
+    if self.root:
+      self.traverseInOrder(self.root)
   ### вывод: левый - корень - правый
   def traverseInOrder(self, node):
     if node.leftChild: # != None
@@ -206,10 +231,13 @@ class AVL(object):
 # avl3.traverse() # right left heavy situation 50 <- 55 -> 60
 
 avl4 = AVL()
-avl4.insert(1)
-avl4.insert(2)
-avl4.insert(3)
-avl4.insert(4)
-alv4.traverse() # 1 2 3 4
-avl4.remove(2)
-alv4.traverse() # 1 3 4
+avl4.insert(10)
+avl4.insert(20)
+avl4.insert(5)
+avl4.insert(6)
+avl4.insert(15)
+avl4.traverse()
+
+avl4.remove(15)
+avl4.remove(20)
+avl4.traverse()
