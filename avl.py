@@ -10,7 +10,7 @@ class AVL(object):
     self.root = None
 
   # проверяем валидность подДерева ()
-  def settleViolation(data, node):
+  def settleViolation(self, data, node):
     balance = self.calcBalance(node)
     if balance > 1 and data < node.leftChild.data: # 1 case
       print('Left left heavy situation ...')
@@ -30,7 +30,7 @@ class AVL(object):
       node.rightChild = self.rotateRight(node.rightChild)
       return self.rotateLeft(node)
 
-    print('subTree balanced =) ...')
+    print('subTree balanced =) ... %s ' % data)
     return node
 
   def insert(self, data):
@@ -67,7 +67,7 @@ class AVL(object):
 
   # O(1)
   def rotateRight(self, node):
-    print('Rotate to the right on node % ' % node.data)
+    print('Rotate to the right on node %s ' % node.data)
 
     # сохраняем левого ребенка и из него еще берем правого ребенка
     tempLeftChild = node.leftChild
@@ -92,15 +92,15 @@ class AVL(object):
 
   # O(1)
   def rotateLeft(self, node):
-    print('Rotate to the left on node % ' % node.data)
+    print('Rotate to the left on node %s ' % node.data)
 
     # сохраняем правого ребенка и из него еще берем левого ребенка
     tempRightChild = node.rightChild
-    rightChild_leftChild = tempRightChild.rightChild
+    rightChild_leftChild = tempRightChild.leftChild
 
     # правый ребенок node присваивает себе левым ребенком - родителя
     # node берет левого ребенка из правого ребенка (левого ребенка node)
-    tempRightChild.rightChild = node
+    tempRightChild.leftChild = node
     node.rightChild = rightChild_leftChild
 
     # пересчитываем высоты для нового корня leftChild и
@@ -114,3 +114,46 @@ class AVL(object):
 
     # вернем новый корень подДерева
     return tempRightChild
+
+  def traverse(self):
+    if not self.root:
+      return
+
+    self.traverseInOrder(self.root)
+
+  def traverseInOrder(self, node):
+    if node.leftChild: # != None
+      self.traverseInOrder(node.leftChild)
+
+    print(' -> %s ' % node.data)
+
+    if node.rightChild: #  != None
+      self.traverseInOrder(node.rightChild)
+
+
+avl = AVL()
+avl.insert(10)
+avl.insert(20)
+avl.insert(30)
+avl.traverse() # right right heavy situation 10 <- 20 -> 30
+
+
+avl2 = AVL()
+avl2.insert(5)
+avl2.insert(3)
+avl2.insert(2)
+avl2.traverse() # left left heavy situation 2 <- 3 -> 5
+
+
+avl3 = AVL()
+avl3.insert(5)
+avl3.insert(3)
+avl3.insert(4)
+avl3.traverse() # left right heavy situation 3 <- 4 -> 5
+
+
+avl3 = AVL()
+avl3.insert(50)
+avl3.insert(60)
+avl3.insert(55)
+avl3.traverse() # right left heavy situation 50 <- 55 -> 60
